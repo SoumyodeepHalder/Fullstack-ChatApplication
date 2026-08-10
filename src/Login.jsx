@@ -124,8 +124,6 @@ const Login = ({username, setUsername, password, setPassword}) => {
                         className="text-white underline hover:text-[#EE8133] transition-colors ml-1">Register</Link>
                 </footer>
             </main>
-            <div id='#example' className='absolute top-[250px] right-[350px] text-gray-700'>Use username: Anand</div>
-            <div id='#example' className='absolute top-[350px] right-[350px] text-gray-700'>Use password: Anand</div>
         </div>
     )
 }
