@@ -23,7 +23,7 @@ const Home = ({ username, password }) => {
             navigate('/');
         }
         
-        socketRef.current = io('http://localhost:5000', {
+        socketRef.current = io('https://socket-stream-api.vercel.app/', {
             transports: ['websocket'],
             upgrade: false
         });
