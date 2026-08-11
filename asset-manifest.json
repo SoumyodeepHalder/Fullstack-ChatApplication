@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Fullstack-ChatApplication/static/css/main.67557c1c.css",
-    "main.js": "/Fullstack-ChatApplication/static/js/main.4ab6a09a.js",
+    "main.js": "/Fullstack-ChatApplication/static/js/main.2f9c38f0.js",
     "static/js/453.cc462b44.chunk.js": "/Fullstack-ChatApplication/static/js/453.cc462b44.chunk.js",
     "index.html": "/Fullstack-ChatApplication/index.html",
     "main.67557c1c.css.map": "/Fullstack-ChatApplication/static/css/main.67557c1c.css.map",
-    "main.4ab6a09a.js.map": "/Fullstack-ChatApplication/static/js/main.4ab6a09a.js.map",
+    "main.2f9c38f0.js.map": "/Fullstack-ChatApplication/static/js/main.2f9c38f0.js.map",
     "453.cc462b44.chunk.js.map": "/Fullstack-ChatApplication/static/js/453.cc462b44.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.67557c1c.css",
-    "static/js/main.4ab6a09a.js"
+    "static/js/main.2f9c38f0.js"
   ]
 }
