@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
 const Home = ({ username, password }) => {
-    const [currentRecipient, setCurrentRecipient] = useState('Bikash');
+    const [currentRecipient, setCurrentRecipient] = useState('');
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
     const [users, setUsers] = useState([]);
@@ -14,44 +14,69 @@ const Home = ({ username, password }) => {
     
     const navigate=useNavigate();
     const socketRef=useRef (null);
-
     
+    console.log('4. started home.jsx with username: ',username);
     
     useEffect(() => {
         if (username===''){
+            console.log('error: username found to be empty string so redirecting to login page');
             navigate('/');
         }
         
-        socketRef.current = io('https://socket-stream-api.vercel.app/', {
+        socketRef.current = io('http://localhost:5000', {
             transports: ['websocket'],
             upgrade: false
         });
-        
-
 
         socketRef.current.on('connect', () => {
-            if (username!==''){
-                socketRef.current.emit('register_user', username);
-            }
+            console.log('5. socket connected. sending register_user');
+            socketRef.current.emit('register_user', username);
         });
 
         socketRef.current.on('receive_message', (data) => {
+            console.log('received a message from', data.sender);
             setCurrentRecipient((latestRecipient) => {
                 if (data.sender === latestRecipient) {
-                    setMessages((prev) => [...prev, { sender: data.sender, message: data.message }]);
+                    console.log(data.sender, 'is the current recipient. so adding message to chat screen');
+                    console.log('determining if previous messages are there or not: ',messages.length)
+                    if (messages.length){
+                        setMessages((prev) => [...prev, { sender: data.sender, message: data.message }]);
+                    }
+                    else{
+                        console.log("chat screen is black so showing the first message");
+                        setMessages([{ sender: username, message: inputMessage }])
+                    }
                 } else {
-                    console.log('new unread message');
+                    console.log(data.sender, ' is not current recipient so not showing the messag to screen');
                 }
                 return latestRecipient;
             })
         })
         socketRef.current.on('chat-history', (historyData) => {
-            setMessages(historyData);
+            if (historyData==null){
+                console.log("9. history data found null");
+                setMessages([])
+            }
+            else{
+                console.log('9. chat history received: ', historyData);
+                setMessages(historyData);
+            }
         });
 
-        socketRef.current.on('online_users', (data)=>{
-            setUsers(data.filter(item => item !== username));
-            socketRef.current.emit('chat-history', data[0]);
+        socketRef.current.on('online_users', async(data)=>{
+            console.log('6. got the list of online users: ', data);
+            const filtered=data.filter(item => item !== username);
+            setUsers(filtered)
+            console.log('7. filtered out own username: ',filtered);
+            if(filtered.length===0){
+                console.log('11. no user to fetch');
+            }
+            else{
+                setCurrentRecipient(filtered[0]);
+                setItemIndex(0)
+                console.log('8. fetheing chat-history of the first user: ', filtered[0]);
+                socketRef.current.emit('chat-history', filtered[0]);
+            }
         });
 
         // --- Integrated jQuery Responsive Viewport Setup ---
@@ -79,6 +104,7 @@ const Home = ({ username, password }) => {
     // 2. Handler to send outgoing messages
     const sendMessage = (e) => {
         e.preventDefault();
+        console.log('1. starting process of sending message ', username, 'to', currentRecipient);
         if (!inputMessage.trim() || !socketRef.current) return;
 
         const messageData = {
@@ -88,10 +114,16 @@ const Home = ({ username, password }) => {
         };
 
         // Emit message to backend
+        console.log('2. private message has been sent')
         socketRef.current.emit('private_message', messageData);
 
         // Optimistically add message to your own UI screen
-        setMessages((prev) => [...prev, { sender: username, message: inputMessage }]);
+        if (messages){
+            setMessages((prev) => [...prev, { sender: username, message: inputMessage }]);
+        }
+        else{
+            setMessages([{ sender: username, message: inputMessage }])
+        }
         setInputMessage('');
     };
 
@@ -117,7 +149,7 @@ const Home = ({ username, password }) => {
                     {/* <!-- Contacts Navigation Stream --> */}
                     <nav className="flex-1 overflow-y-auto p-3 space-y-2">
                         {/* <!-- Contact item entry --> */}
-                        {users.map((item, index) => (
+                        {users?users.map((item, index) => (
                             item!==username?
                             <button
                                 className={`contact-btn w-full flex items-center gap-3 p-3.5 rounded-xl text-left transition ${itemIndex === index ? 'bg-zinc-700/70 border-l-4 border-[#ff6a00]' : 'bg-zinc-800/40 hover:bg-zinc-800'}`} onClick={() => {
@@ -141,7 +173,7 @@ const Home = ({ username, password }) => {
                                 </div>
                                 <span className="font-medium text-zinc-200">{item}</span>
                             </button>:''
-                        ))}
+                        )):''}
                     </nav>
                 </aside>
 
@@ -162,7 +194,7 @@ const Home = ({ username, password }) => {
                                 className="w-9 h-9 bg-zinc-700 rounded-full flex items-center justify-center text-zinc-400 text-sm">
                                 <i className="fa-solid fa-user"></i>
                             </div>
-                            <h2 id="active-chat-user" className="font-medium text-zinc-100 text-base">{users[itemIndex]}</h2>
+                            <h2 id="active-chat-user" className="font-medium text-zinc-100 text-base">{users?users[itemIndex]:''}</h2>
                         </div>
                         {/* <!-- Menu / Navigation utilities --> */}
                         <button className="text-zinc-400 hover:text-white p-2 rounded-lg text-xl focus:outline-none">
@@ -173,15 +205,15 @@ const Home = ({ username, password }) => {
 
                     {/* <!-- Chat Message Streams Viewport Container --> */}
                     <div id="chat-box" className="flex-1 overflow-y-auto p-6 space-y-6">
-                        <p className="text-xs text-center text-gray-500 my-4">Conversation started with Bikashh</p>
-                        {messages.map((item) => (
+                        <p className="text-xs text-center text-gray-500 my-4">Conversation started with {currentRecipient}</p>
+                        {messages?messages.map((item) => (
                             <div className={`flex ${item.sender === username ? 'items-end justify-end ml-auto' : 'items-start'} max-w-[85%] sm:max-w-xl animate-fade-in`}>
                                 <div
                                     className={`bg-[#505050] text-zinc-100 py-3 px-5 rounded-2xl ${item.sender === username ?'rounded-tr-sm': 'rounded-tl-sm'} text-sm relative shadow-md leading-relaxed`}>
                                     {item.message}
                                 </div>
                             </div>
-                        ))}
+                        )):""}
                     </div>
 
                     {/* <!-- Messages Composing Input Toolbar Footer --> */}

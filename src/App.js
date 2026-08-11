@@ -6,7 +6,6 @@ import Login from './Login';
 import Register from './Register';
 
 function App() {
-  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   return (

@@ -1,25 +1,24 @@
 import React from 'react';
 import { useState } from 'react';
-import {Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-const Register = ({username, setUsername, password, setPassword}) => {
-    // const [username, setUsername] = useState('');
-    // const [password, setPassword] = useState('');
+const Register = ({ username, setUsername, password, setPassword }) => {
     const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const handleUsernameChange =(e)=>{
-    setUsername(e.target.value)
-  }
+    const handleUsernameChange = (e) => {
+        setUsername(e.target.value)
+    }
 
-  const handlePassChange = (e)=>{
-    setPassword(e.target.value)
-  }
+    const handlePassChange = (e) => {
+        setPassword(e.target.value)
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("submitted");
+        console.log("starting process of registering a new user and showing all available users ---");
+        console.log("1. registreation page submitted: ", username, password);
 
         const trimmedUsername = username.trim();
 
@@ -36,14 +35,16 @@ const Register = ({username, setUsername, password, setPassword}) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username: trimmedUsername, password:password }),
+                body: JSON.stringify({ username: trimmedUsername, password: password }),
             });
 
             const data = await response.json();
+            console.log("2. recived response: ", data);
 
             if (response.ok) {
                 // Backend returns status 200 on successful match
-                    navigate('/Home'); 
+                console.log("3. redirecting to home page");
+                navigate('/Home');
             } else {
                 // Handle backend error messages
                 alert(data.message || 'An error occurred during submission. Please try again.');
@@ -113,7 +114,7 @@ const Register = ({username, setUsername, password, setPassword}) => {
                     <div class="pt-4 flex justify-center">
                         <button type="submit" id="submitBtn" onClick={handleSubmit}
                             class="w-44 h-11 bg-[#EE8133] text-white font-medium rounded-xl hover:bg-[#d66f25] active:scale-95 transition-all text-base shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#242424] focus:ring-[#EE8133]">
-                            Submit
+                            {isLoading ? 'Verifying...' : 'Submit'}
                         </button>
                     </div>
                 </form>
