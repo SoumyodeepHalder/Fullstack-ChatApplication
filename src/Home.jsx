@@ -38,14 +38,15 @@ const Home = ({ username, password }) => {
             setCurrentRecipient((latestRecipient) => {
                 if (data.sender === latestRecipient) {
                     console.log(data.sender, 'is the current recipient. so adding message to chat screen');
-                    console.log('determining if previous messages are there or not: ',messages.length)
-                    if (messages.length){
-                        setMessages((prev) => [...prev, { sender: data.sender, message: data.message }]);
-                    }
-                    else{
-                        console.log("chat screen is black so showing the first message");
-                        setMessages([{ sender: username, message: inputMessage }])
-                    }
+                    // console.log('determining if previous messages are there or not: ',messages.length)
+                    // if (messages.length){
+                    //     setMessages((prev) => [...prev, { sender: data.sender, message: data.message }]);
+                    // }
+                    // else{
+                    //     console.log("chat screen is black so showing the first message");
+                    //     setMessages([{ sender: data.sender, message: data.message }])
+                    // }
+                    setMessages(data.message)
                 } else {
                     console.log(data.sender, ' is not current recipient so not showing the messag to screen');
                 }
